@@ -78,9 +78,29 @@ Promise.map([
         feeds.forEach(feed => {
 
             feed.records.forEach(item => {
-                item._id = item.guid;
-                delete item.guid;
-                bulk.find({ _id: item._id }).upsert().updateOne({ "$set": item });
+
+                let feedItem = {};
+
+
+                feedItem._id = item.guid;
+                feedItem.title = item.title;
+                feedItem.summary = item.summary;
+                feedItem.link = item.link;
+                feedItem.origlink = item.origlink;
+
+                //feedItem.feed = ..
+                
+                feedItem.date = item.date;
+                feedItem.pubDate = item.pubDate;
+                feedItem.pubdate = item.pubdate;
+
+                feedItem.image = utils.getImage(item)
+
+                //title
+                //summary
+                //
+
+                bulk.find({ _id: feedItem._id }).upsert().updateOne({ "$set": feedItem });
             })
 
 
