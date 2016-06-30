@@ -13,24 +13,23 @@ const getImage = item => {
         return new Promise((resolve, reject) => {
 
             if (!_.isEmpty(item.image) ) {
-                console.log(" --- 1 -----");
-
                 resolve(item.image)
+
             } else if (item.enclosures && item.enclosures.length > 0) {
-                console.log(" --- 2 -----");
-                resolve(item.enclosures[0].url)
+                resolve( { url: item.enclosures[0].url, type: 1 })
+
             } else if (item.link) {
 
                 let client = new MetaInspector(item.link, {timeout: 10000});
 
                 client.on("fetch", function () {
-                    
+
                     if(!_.isEmpty(client.image)){
-                        console.log(" --- 3 -----");
-                        resolve(client.image);
+                        resolve( {url: client.image, type: 2});
+
                     } else {
-                        console.log(" --- 4 -----");
-                        resolve(ineed.collect.images.fromHtml(item.description).images[0]);
+                        resolve( {url: ineed.collect.images.fromHtml(item.description).images[0].src, type: 2} );
+                        
                     }
                 });
                 client.on("error", function (err) {
