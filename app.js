@@ -138,8 +138,10 @@ const crawl = () => {
         })
 }
 
-crawl();
-
-
-
-
+new CronJob('0 */15 * * * *', function() {
+        console.log(" -------------------- crawl --------------------")
+        crawl()
+    },
+    null,
+    true /* Start the job right now */
+);
