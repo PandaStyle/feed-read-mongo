@@ -43,7 +43,7 @@ module.exports = [
     {
         id: 9,
         name: "Construction",
-        url: "http://archrecord.construction.com/"
+        url: "http://www.architecturalrecord.com/rss/articles"
     },
     {
         id: 10,
@@ -51,13 +51,8 @@ module.exports = [
         url: "http://www.notcot.org/atom.php"
     },
     {
-        id: 11,
-        name: "Metropolis",
-        url: "http://www.metropolismag.com/rss.xml"
-    },
-    {
         id: 12,
-        name: "Desing Milk",
+        name: "Design Milk",
         url: "http://feeds.feedburner.com/design-milk"
     },
     {
@@ -91,11 +86,6 @@ module.exports = [
         url: "http://www.builderonline.com/design/technology/?rss=true"
     },
     {
-        id: 19,
-        name: "Green Source",
-        url: "http://greensource.construction.com/rss/gs.xml"
-    },
-    {
         id: 20,
         name: "ENR",
         url: "http://www.enr.com/rss/articles"
@@ -115,7 +105,6 @@ module.exports = [
         name: "The Atlantic Cities",
         url: "http://feeds.feedburner.com/TheAtlanticCities"
     }
-
 ]
 
 

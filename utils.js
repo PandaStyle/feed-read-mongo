@@ -13,10 +13,10 @@ const getImage = item => {
         return new Promise((resolve, reject) => {
 
             if (!_.isEmpty(item.image) ) {
-                resolve(item.image)
+                resolve({url: item.image, type: 1 })
 
             } else if (item.enclosures && item.enclosures.length > 0) {
-                resolve( { url: item.enclosures[0].url, type: 1 })
+                resolve( { url: item.enclosures[0].url, type: 2 })
 
             } else if (item.link) {
 
@@ -25,17 +25,27 @@ const getImage = item => {
                 client.on("fetch", function () {
 
                     if(!_.isEmpty(client.image)){
-                        resolve( {url: client.image, type: 2});
+                        resolve( {url: client.image, type: 3});
 
                     } else {
-                        resolve( {url: ineed.collect.images.fromHtml(item.description).images[0].src, type: 2} );
-                        
+                        if (item.description && ineed.collect.images.fromHtml(item.description).images) {
+                            resolve({url: ineed.collect.images.fromHtml(item.description).images[0], type: 4});
+                        } else {
+                            resolve({url: "", type: 5})
+                        }
                     }
                 });
                 client.on("error", function (err) {
                     console.log("Error from Metainspector");
                     console.log("item:" + item.link);
-                    reject(err)
+
+                    if (item.description && ineed.collect.images.fromHtml(item.description).images) {
+                        resolve({url: ineed.collect.images.fromHtml(item.description).images[0], type: 4});
+                    } else {
+                        reject(err)
+                    }
+
+
                 });
 
                 client.fetch();

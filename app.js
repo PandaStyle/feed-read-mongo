@@ -38,13 +38,16 @@ const fetch = (url) => {
             items = [];
 
         feedparser.on('error', (e) => {
+            console.log("ERROR")
+            console.error(e)
             return reject(e);
         }).on('readable', () => {
             // This is where the action is!
             var item;
 
             while (item = feedparser.read()) {
-                items.push(item)
+                if(items.length < 5)
+                    items.push(item)
             }
         }).on('end', () => {
             resolve(items);
@@ -100,6 +103,8 @@ const createFeedItem = (item, bulk) => {
 
                 bulk.find({ _id: feedItem._id }).upsert().updateOne({ "$set": feedItem });
 
+                console.log(feedItem._id)
+
                 resolve(feedItem);
             })
     })
@@ -107,7 +112,7 @@ const createFeedItem = (item, bulk) => {
 
 
 const crawl = () => {
-    Promise.map(feeds.map(item => item.url), (url) => fetch(url), {concurrency: 2})
+    Promise.map(feeds.map(item => item.url), (url) => fetch(url))
         .then((feeds) => {
 
             const bulk = Feed.collection.initializeUnorderedBulkOp();
@@ -133,15 +138,7 @@ const crawl = () => {
         })
 }
 
-
-
-new CronJob('0 */15 * * * *', function() {
-        console.log(" -------------------- crawl --------------------")
-        crawl()
-    },
-    null,
-    true /* Start the job right now */
-);
+crawl();
 
 
 
