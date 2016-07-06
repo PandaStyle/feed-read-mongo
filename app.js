@@ -6,10 +6,12 @@
 
 const
     _ = require('lodash'),
+    Base64 = require('js-base64').Base64,
     Promise = require('bluebird'),
     request = require('request'),
     FeedParser = require('feedparser'),
     CronJob = require('cron').CronJob,
+    ent = require('ent'),
     mongoose = require('mongoose'),
     Schema = mongoose.Schema,
 
@@ -78,16 +80,20 @@ const createFeedItem = (item, bulk) => {
             .then(function (image) {
                 let feedItem = {};
 
-                feedItem._id = item.guid;
+                if(!_.isNull(item.guid)){
+                    feedItem._id = Base64.encode(item.guid)
+                } else {
+                    //hopefully 'bcn network' feed only
+                    feedItem._id = Base64.encode(item.title)
+                }
+
                 feedItem.title = item.title;
-                feedItem.summary = item.summary;
+                feedItem.summary = !_.isEmpty(item.summary) ? ent.decode(item.summary).replace(/<\/?[^>]+(>|$)/g, "").replace(/[\n\t\r]/g,"") : item.summary;
 
                 feedItem.description = utils.getDescription(item)
 
                 feedItem.link = item.link;
                 feedItem.origlink = item.origlink;
-
-                //feedItem.feed = ..
 
                 feedItem.date = item.date;
                 feedItem.pubDate = item.pubDate;
@@ -102,8 +108,6 @@ const createFeedItem = (item, bulk) => {
                 }
 
                 bulk.find({ _id: feedItem._id }).upsert().updateOne({ "$set": feedItem });
-
-                console.log(feedItem._id)
 
                 resolve(feedItem);
             })
@@ -123,7 +127,11 @@ const crawl = () => {
 
             return Promise.map(flattened, item => createFeedItem(item, bulk))
                 .then(res => {
+                    
+                    var ids = res.map( i => i._id)
                     console.log("Read length: ", res.length)
+                    console.log("Unique length, supposed to be the same ", _.uniq(ids).length);
+                    
                     return res;
                 })
                 .then(() => {
