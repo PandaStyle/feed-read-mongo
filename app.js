@@ -18,7 +18,7 @@ const
     logger = require('./logger.js'),
     utils = require('./utils.js'),
 
-    feeds = require('./feeds.js')
+    feedAccounts = require('./feeds.js')
 
 
 mongoose.connect('mongodb://127.0.0.1:27017/test');
@@ -107,16 +107,29 @@ const createFeedItem = (item, bulk) => {
                     description: item.meta.description
                 }
 
+                if(!_.find(feedAccounts, (feedAccount) => {
+                        return item.meta.link.includes(feedAccount.link)
+                    })) {
+                    console.error("No feedId found for: ", item.meta.link);
+                } else {
+                    feedItem.feedId = _.find(feedAccounts, (feedAccount) => {
+                        return item.meta.link.includes(feedAccount.link)
+                    }).id
+                }
+
                 bulk.find({ _id: feedItem._id }).upsert().updateOne({ "$set": feedItem });
 
                 resolve(feedItem);
+            }).catch(err => {
+            console.error(err);
+                throw err
             })
     })
 }
 
 
 const crawl = () => {
-    Promise.map(feeds.map(item => item.url), (url) => fetch(url))
+    Promise.map(feedAccounts.map(item => item.url), (url) => fetch(url))
         .then((feeds) => {
 
             const bulk = Feed.collection.initializeUnorderedBulkOp();
@@ -127,11 +140,11 @@ const crawl = () => {
 
             return Promise.map(flattened, item => createFeedItem(item, bulk))
                 .then(res => {
-                    
+
                     var ids = res.map( i => i._id)
                     console.log("Read length: ", res.length)
-                    console.log("Unique length, supposed to be the same ", _.uniq(ids).length);
-                    
+                    console.log("Unique length: ", _.uniq(ids).length);
+
                     return res;
                 })
                 .then(() => {

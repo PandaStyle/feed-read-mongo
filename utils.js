@@ -36,13 +36,15 @@ const getImage = item => {
                     }
                 });
                 client.on("error", function (err) {
-                    console.log("Error from Metainspector");
-                    console.log("item:" + item.link);
+                    console.log("meta error")
 
                     if (item.description && ineed.collect.images.fromHtml(item.description).images) {
+                        console.log("ineed")
+                        console.log(ineed.collect.images.fromHtml(item.description).images[0])
                         resolve({url: ineed.collect.images.fromHtml(item.description).images[0], type: 4});
                     } else {
-                        reject(err)
+                        console.log("No image found for item: ", + item.link);
+                        resolve({url: "", type: 5})
                     }
 
 
