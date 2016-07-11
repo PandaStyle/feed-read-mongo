@@ -12,6 +12,7 @@ const
     FeedParser = require('feedparser'),
     CronJob = require('cron').CronJob,
     ent = require('ent'),
+    moment = require('moment'),
     mongoose = require('mongoose'),
     Schema = mongoose.Schema,
 
@@ -24,7 +25,8 @@ const
 mongoose.connect('mongodb://127.0.0.1:27017/test');
 
 const feedSchema = new Schema({
-    _id: String
+    _id: String,
+    pubDate: Date
 }, {strict: false});
 const Feed = mongoose.model('Feed', feedSchema);
 
@@ -96,7 +98,9 @@ const createFeedItem = (item, bulk) => {
                 feedItem.origlink = item.origlink;
 
                 feedItem.date = item.date;
-                feedItem.pubDate = item.pubDate;
+
+                feedItem.pubDate = new Date(item.pubDate);
+
                 feedItem.pubdate = item.pubdate;
 
                 feedItem.image = image.url;
@@ -116,7 +120,12 @@ const createFeedItem = (item, bulk) => {
                         return item.meta.link.includes(feedAccount.link)
                     }).id
                 }
-
+                
+                //Archdaily hack
+                if(feedItem.feedId && _.find(feedAccounts, { 'id': feedItem.feedId}).timeZoneFix){
+                    feedItem.pubDate = moment(new Date(feedItem.pubDate)).add(_.find(feedAccounts, { 'id': feedItem.feedId}).timeZoneFix, 'hours').toDate();
+                }
+                
                 bulk.find({ _id: feedItem._id }).upsert().updateOne({ "$set": feedItem });
 
                 resolve(feedItem);

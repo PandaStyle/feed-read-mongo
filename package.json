@@ -16,6 +16,7 @@
     "ineed": "^1.0.4",
     "js-base64": "^2.1.9",
     "lodash": "^4.13.1",
+    "moment": "^2.14.1",
     "mongoose": "^4.5.2",
     "node-metainspector": "^1.3.0",
     "request": "^2.72.0",

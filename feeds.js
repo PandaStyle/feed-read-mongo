@@ -6,7 +6,8 @@ module.exports =
             id: 1,
             name: "ArchDaily",
             link: "http://www.archdaily.com/",
-            url: "http://feeds.feedburner.com/ArchDaily"
+            url: "http://feeds.feedburner.com/ArchDaily",
+            timeZoneFix: 4
         },
         {
             id: 2,
@@ -30,7 +31,7 @@ module.exports =
             id: 5,
             name: "Archidose",
             link: "http://archidose.blogspot.com/",
-            url: "http://archidose.blogspot.com/feeds/posts/default"
+            url: "http://feeds.feedburner.com/archidose"
         },
         {
             id: 6,

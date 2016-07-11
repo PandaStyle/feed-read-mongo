@@ -3,6 +3,8 @@
 const MetaInspector = require('node-metainspector');
 const ineed = require ("ineed");
 const _ = require('lodash');
+const feedAccounts = require('./feeds.js')
+
 
 var config = {
     maxBodyLength: 150
@@ -19,6 +21,25 @@ const getImage = item => {
                 resolve( { url: item.enclosures[0].url, type: 2 })
 
             } else if (item.link) {
+
+
+                //BD+C network force ineed instead of meta
+                if(isBDCNetwork(item)){
+
+                    return ineed.collect.images.from(item.link,
+                        function (err, response, result) {
+                            var a = _.find(result.images,  i => {
+                                return  i.src.includes('content_feed')
+                            })
+                            if(a){
+                                resolve({url: a.src, type: 4});
+                            } else {
+                                resolve({url: "", type: 5})
+                            }
+
+                        });
+                }
+
 
                 let client = new MetaInspector(item.link, {timeout: 10000});
 
@@ -132,8 +153,17 @@ function trimWhitespace (s) { //rewrite -- 5/30/14 by DW
     return (s);
 }
 
+const isBDCNetwork = (item) => {
+    const bdcid = 20;
+
+    var link = _.find(feedAccounts, {id: bdcid}).link
+
+    return item.meta.link.includes(link);
+}
+
 
 module.exports = {
     getImage: getImage,
-    getDescription: getDescription
+    getDescription: getDescription,
+    isBDCNetwork: isBDCNetwork
 }
