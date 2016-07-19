@@ -120,14 +120,17 @@ const createFeedItem = (item, bulk) => {
                         return item.meta.link.includes(feedAccount.link)
                     }).id
                 }
-                
+
                 //Archdaily hack
                 if(feedItem.feedId && _.find(feedAccounts, { 'id': feedItem.feedId}).timeZoneFix){
                     feedItem.pubDate = moment(new Date(feedItem.pubDate)).add(_.find(feedAccounts, { 'id': feedItem.feedId}).timeZoneFix, 'hours').toDate();
                 }
-                
-                bulk.find({ _id: feedItem._id }).upsert().updateOne({ "$set": feedItem });
 
+                //only add to bulk if it has a link
+                if(feedItem.link)
+                    bulk.find({ _id: feedItem._id }).upsert().updateOne({ "$set": feedItem });
+
+                
                 resolve(feedItem);
             }).catch(err => {
             console.error(err);
@@ -164,6 +167,9 @@ const crawl = () => {
                         console.log(JSON.stringify(result, undefined, 4));
                     });
                 })
+                .catch(err => {
+                    console.error("Feeditem creation error: ", err);
+                })
 
         })
 }
@@ -173,5 +179,5 @@ new CronJob('0 */15 * * * *', function() {
         crawl()
     },
     null,
-    true /* Start the job right now */
+    true
 );

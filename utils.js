@@ -14,6 +14,12 @@ const getImage = item => {
 
         return new Promise((resolve, reject) => {
 
+
+            //reject if there is no link
+            if(!item.link) {
+                resolve({url: ""});
+            }
+
             if (!_.isEmpty(item.image) ) {
                 resolve({url: item.image, type: 1 })
 
@@ -28,6 +34,16 @@ const getImage = item => {
 
                     return ineed.collect.images.from(item.link,
                         function (err, response, result) {
+                            if(err){
+                                console.error(err)
+                                resolve({url: "", type: 5})
+                            }
+
+                            if(!result.images){
+                                console.error("No image in ineed result")
+                                resolve({url: "", type: 5})
+                            }
+
                             var a = _.find(result.images,  i => {
                                 return  i.src.includes('content_feed')
                             })
