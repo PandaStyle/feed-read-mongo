@@ -78,8 +78,8 @@ module.exports =
         {
             id: 13,
             name: "Abduzeedo",
-            link: "http://abduzeedo.com/taxonomy/term/12461/all",
-            url: "http://abduzeedo.com/taxonomy/term/12461/all/feed"
+            link: "http://abduzeedo.com",
+            url: "http://abduzeedo.com/rss.xml"
         },
         {
             id: 14,

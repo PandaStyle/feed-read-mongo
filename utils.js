@@ -31,6 +31,8 @@ const getImage = item => {
 
                 //BD+C network force ineed instead of meta
                 if(isBDCNetwork(item)){
+                    resolve({url: "", type: 6});
+                    return;
 
                     return ineed.collect.images.from(item.link,
                         function (err, response, result) {
@@ -39,7 +41,7 @@ const getImage = item => {
                                 resolve({url: "", type: 5})
                             }
 
-                            if(!result.images){
+                            if(!result || !_.isNull(result) || !result.images){
                                 console.error("No image in ineed result")
                                 resolve({url: "", type: 5})
                             }
